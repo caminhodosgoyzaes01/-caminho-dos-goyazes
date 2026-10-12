@@ -76,3 +76,45 @@ footer p { font-size: 13px; color: #b8cfc0; }
 @media (max-width: 768px) {
   .banner-principal { height: 160px; }
 }
+ /* Título sobre a fotografia panorâmica */
+
+.hero-fotografica {
+  min-height: 420px;
+  padding: 70px 0;
+  display: flex;
+  align-items: center;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(10, 39, 30, 0.88) 0%,
+      rgba(10, 39, 30, 0.65) 48%,
+      rgba(10, 39, 30, 0.18) 100%
+    ),
+    url("banner-goyazes.png.png");
+
+  background-size: cover;
+  background-position: center;
+  color: white;
+}
+
+.hero-fotografica .container {
+  width: 100%;
+}
+
+.hero-fotografica h1 {
+  max-width: 780px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 768px) {
+  .hero-fotografica {
+    min-height: 360px;
+    padding: 48px 0;
+    background-position: center;
+  }
+
+  .hero-fotografica h1 {
+    font-size: clamp(30px, 8vw, 42px);
+  }
+}

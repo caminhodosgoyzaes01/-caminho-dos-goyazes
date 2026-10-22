@@ -1,1 +1,86 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Divulgação científica sobre conectividade de paisagens do Cerrado"><title>Explore o território | Caminho dos Goyazes</title><link rel="stylesheet" href="estilo.css"></head><body><a class="skip" href="#conteudo">Pular para o conteúdo</a><header class="site-header"><div class="container header-inner"><a class="brand" href="index.html"><span class="brand-icon" aria-hidden="true">✳</span><span>Caminho dos Goyazes<br><small>A Ciência das Paisagens</small></span></a><button class="menu-button" aria-expanded="false" aria-controls="menu" type="button">☰ Menu</button><nav id="menu" aria-label="Navegação principal"><a href="index.html">Início</a><a href="artigos.html">Artigos</a><a href="mapas.html" aria-current="page">Mapas</a><a href="produtos.html">Produtos educativos</a><a href="equipe.html">Equipe e contato</a></nav></div></header><main id="conteudo"><section class="hero"><div class="container"><p class="eyebrow">PESQUISA · CONSERVAÇÃO · EDUCAÇÃO</p><h1>Mapas e dados espaciais</h1><p>Aqui será incorporado o SIG interativo do projeto, com camadas geográficas e informações das áreas estudadas.</p></div></section><div class="container main-content"><div class="section-heading"><p class="eyebrow dark">DIVULGAÇÃO CIENTÍFICA</p><h2>Explore o território</h2></div><section class="map-placeholder"><div class="map-symbol">⌖</div><h2>Espaço reservado para o WebSIG</h2><p>Integraremos aqui os mapas exportados do QGIS pelo qgis2web ou desenvolvidos com Leaflet.</p><p class="small">Futuras camadas: áreas de estudo, fragmentos de vegetação, corredores ecológicos e trilhas.</p></section><section class="panel"><h2>Como utilizar os mapas</h2><p>Esta seção apresentará legendas, fontes dos dados, sistema de referência e orientações de navegação.</p></section></div></main><footer><div class="container"><strong>Caminho dos Goyazes: A Ciência das Paisagens</strong><p>Site de divulgação científica · Conteúdo demonstrativo para personalização</p><p>© <span id="ano"></span> Projeto de pesquisa</p></div></footer><script src="site.js" defer></script></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mapas Interativos | Caminho dos Goyazes</title>
+
+  <link rel="stylesheet" href="estilo.css">
+
+  <style>
+    .pagina-mapas {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .pagina-mapas h1 {
+      color: #285943;
+      margin-bottom: 15px;
+    }
+
+    .descricao-mapa {
+      line-height: 1.7;
+      margin-bottom: 25px;
+    }
+
+    .mapa-interativo {
+      width: 100%;
+      height: 600px;
+      border: 0;
+      border-radius: 12px;
+    }
+
+    .titulo-mapa {
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .mapa-interativo {
+        height: 450px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <nav>
+        <a href="index.html">Início</a>
+        <a href="artigos.html">Produção Científica</a>
+        <a href="mapas.html">Mapas Interativos</a>
+        <a href="produtos.html">Produtos Educativos</a>
+        <a href="equipe.html">Equipe</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="pagina-mapas">
+
+    <h1>Mapas Interativos</h1>
+
+    <p class="descricao-mapa">
+      Explore os mapas produzidos no âmbito do projeto
+      Conectividade das Paisagens do Caminho dos Goyazes
+      para a Gestão Sustentável do Cerrado Goiano.
+    </p>
+
+    <h2 class="titulo-mapa">
+      As Paisagens do Caminho dos Veadeiros
+    </h2>
+
+    <p class="descricao-mapa">
+      Navegue pelo mapa para conhecer os elementos
+      geográficos e as paisagens ao longo do percurso.
+      Utilize as ferramentas de aproximação e clique
+      nos elementos para consultar as informações.
+    </p>
+
+    <iframe
+      class="mapa-interativo"
+      src="https://www.google.com/maps/d/embed?mid=1sVA7-akaD0YkFPAjJjYVD8RTrTW5FgU"
+      loading="lazy"
+      title="As Paisagens do Caminho dos Veadeiros"

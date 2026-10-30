@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Equipe de pesquisadores e colaboradores do projeto Caminho dos Goyazes.">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Equipe de pesquisadores e colaboradores do projeto Caminho dos Goyazes." name="description"/>
 <title>Equipe e contato | Caminho dos Goyazes</title>
-<link rel="stylesheet" href="estilo.css?v=10">
+<link href="estilo.css?v=10" rel="stylesheet"/>
 <style>
 .equipe-conteudo{padding-top:36px;padding-bottom:55px}
 .equipe-intro{max-width:850px;line-height:1.7}
@@ -25,121 +26,146 @@
 @media(max-width:950px){.grade-equipe{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.grade-equipe,.grade-coordenacao{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.integrante{padding:15px 9px}.retrato,.grade-coordenacao .retrato{width:100px;height:100px}.integrante h3{font-size:15px}}
 @media(max-width:380px){.grade-equipe,.grade-coordenacao{grid-template-columns:1fr}}
+
+.grade-coordenacao{grid-template-columns:repeat(5,minmax(0,1fr));max-width:none;gap:14px}
+.grade-coordenacao .integrante{padding:20px 8px}
+.grade-coordenacao .retrato{width:118px;height:118px}
+.retrato{border-color:#d6e5d8;background:#dbe8d7}
+.retrato svg{width:100%;height:100%;display:block}
+@media(max-width:1050px){.grade-coordenacao{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.grade-coordenacao{grid-template-columns:repeat(2,minmax(0,1fr))}.grade-coordenacao .retrato{width:100px;height:100px}}
 </style>
 </head>
-<body>
+<body><svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="avatar-mulher" viewbox="0 0 120 120">
+<circle cx="60" cy="60" fill="#dce8d7" r="60"></circle>
+<path d="M26 95V51C26 23 40 15 60 15S94 27 94 52V95Z" fill="#4b4034"></path>
+<path d="M15 120c4-25 21-36 45-36s41 11 45 36" fill="#315d47"></path>
+<path d="M48 77h24v21c-7 8-17 8-24 0Z" fill="#dba77f"></path>
+<ellipse cx="60" cy="55" fill="#e8b58e" rx="23" ry="30"></ellipse>
+<path d="M36 56c-4-24 8-39 24-39 19 0 28 13 25 37-8-6-13-13-16-22-8 14-18 18-33 24Z" fill="#4b4034"></path>
+<path d="M34 52c-4 15-5 27-7 43 9-4 16-13 17-29Z" fill="#4b4034"></path>
+<path d="M86 52c4 15 5 27 7 43-9-4-16-13-17-29Z" fill="#4b4034"></path>
+</symbol>
+<symbol id="avatar-homem" viewbox="0 0 120 120">
+<circle cx="60" cy="60" fill="#dce8d7" r="60"></circle>
+<path d="M13 120c3-25 22-38 47-38s44 13 47 38" fill="#315d47"></path>
+<path d="M48 76h24v21c-7 7-17 7-24 0Z" fill="#dba77f"></path>
+<ellipse cx="60" cy="54" fill="#e8b58e" rx="24" ry="30"></ellipse>
+<path d="M36 56V39c0-19 12-26 27-26 19 0 27 13 24 32l-3 12-5-19c-12 1-24-4-35 0l-3 18Z" fill="#303d35"></path>
+<path d="M45 75c7 12 23 16 32 0-2 15-12 20-17 20s-15-5-15-20Z" fill="#303d35" opacity=".9"></path>
+</symbol>
+</defs></svg>
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 <header class="site-header">
-  <div class="container header-inner">
-    <a class="brand" href="index.html"><img src="logo-caminho-goyazes.png" alt="Logomarca do projeto Caminho dos Goyazes" class="logo-projeto"></a>
-    <button class="menu-button" aria-expanded="false" aria-controls="menu" type="button">☰ Menu</button>
-    <nav id="menu" aria-label="Navegação principal">
-      <a href="index.html">Início</a><a href="artigos.html">Artigos</a><a href="mapas.html">Mapas</a><a href="produtos.html">Produtos educativos</a><a href="equipe.html" aria-current="page">Equipe e contato</a>
-    </nav>
-  </div>
+<div class="container header-inner">
+<a class="brand" href="index.html"><img alt="Logomarca do projeto Caminho dos Goyazes" class="logo-projeto" src="logo-caminho-goyazes.png"/></a>
+<button aria-controls="menu" aria-expanded="false" class="menu-button" type="button">☰ Menu</button>
+<nav aria-label="Navegação principal" id="menu">
+<a href="index.html">Início</a><a href="artigos.html">Artigos</a><a href="mapas.html">Mapas</a><a href="produtos.html">Produtos educativos</a><a aria-current="page" href="equipe.html">Equipe e contato</a>
+</nav>
+</div>
 </header>
 <main id="conteudo">
 <section class="hero"><div class="container">
-  <p class="eyebrow">PESQUISA · CONSERVAÇÃO · EDUCAÇÃO</p>
-  <h1>Equipe e contato</h1>
-  <p>Conheça as pessoas envolvidas na pesquisa e os temas sob sua responsabilidade.</p>
+<p class="eyebrow">PESQUISA · CONSERVAÇÃO · EDUCAÇÃO</p>
+<h1>Equipe e contato</h1>
+<p>Conheça as pessoas envolvidas na pesquisa e os temas sob sua responsabilidade.</p>
 </div></section>
 <div class="container main-content equipe-conteudo">
-  <section class="equipe-secao" aria-labelledby="titulo-coordenacao">
-    <h2 id="titulo-coordenacao">Coordenação do projeto</h2>
-    <p class="descricao">Coordenação geral, vice-coordenações e coordenação de divulgação científica.</p>
-    <div class="grade-equipe grade-coordenacao">
-      <article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/karla-faria.jpg" alt="Fotografia de Karla Faria" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Karla Faria</h3>
-  <p>Coordenação geral · UFG</p>
+<section aria-labelledby="titulo-coordenacao" class="equipe-secao">
+<h2 id="titulo-coordenacao">Coordenação do projeto</h2>
+<p class="descricao">Coordenação geral, vice-coordenações e coordenação de divulgação científica.</p>
+<div class="grade-equipe grade-coordenacao">
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Karla Faria</h3>
+<p>Coordenação geral · UFG</p>
 </article>
 <article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/silas-trindade.jpg" alt="Fotografia de Silas P. Trindade" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Silas P. Trindade</h3>
-  <p>Vice-coordenação · UEG</p>
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-homem"></use></svg></div>
+<h3>Silas P. Trindade</h3>
+<p>Vice-coordenação · UEG</p>
 </article>
 <article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/gervasio-barbosa.jpg" alt="Fotografia de Gervásio S. Barbosa Neto" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Gervásio S. Barbosa Neto</h3>
-  <p>Vice-coordenação · IFB – Riacho Fundo</p>
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-homem"></use></svg></div>
+<h3>Gervásio S. Barbosa Neto</h3>
+<p>Vice-coordenação · IFB – Riacho Fundo</p>
 </article>
 <article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/kalyna-faria.jpg" alt="Fotografia de Kalyna Faria" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Kalyna Faria</h3>
-  <p>Coordenação de divulgação · UFG/CEPAE</p>
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Kalyna Faria</h3>
+<p>Coordenação de divulgação · UFG/CEPAE</p>
 </article>
 <article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/joyce.jpg" alt="Fotografia de Joyce" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Joyce</h3>
-  <p>Coordenação de divulgação · UFG/CEPAE</p>
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Joyce Oliveira</h3>
+<p>Coordenação de divulgação · UFG/CEPAE</p>
 </article>
-    </div>
-  </section>
-  <section class="equipe-secao" aria-labelledby="titulo-pesquisadores">
-    <h2 id="titulo-pesquisadores">Pesquisadores e colaboradores</h2>
-    <p class="descricao">Integrantes e respectivas áreas de atuação no projeto.</p>
-    <div class="grade-equipe">
-      
+</div>
+</section>
+<section aria-labelledby="titulo-pesquisadores" class="equipe-secao">
+<h2 id="titulo-pesquisadores">Pesquisadores e colaboradores</h2>
+<p class="descricao">Integrantes e respectivas áreas de atuação no projeto.</p>
+<div class="grade-equipe">
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-homem"></use></svg></div>
+<h3>Gustavo S. Souza</h3>
+<p>Dinâmica da paisagem</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Stffane B. F. Lemes</h3>
+<p>Conectividade da paisagem</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Sara Santos</h3>
+<p>Conflitos de uso das terras</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Luana C. Oliveira</h3>
+<p>Análise de conectividade</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Helen Lima de Andrade</h3>
+<p>Serviços ecossistêmicos culturais</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Jaqueline Batista</h3>
+<p>Avaliação da integridade ambiental</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-homem"></use></svg></div>
+<h3>Murilo Galdino de Oliveira</h3>
+<p>Perda de solos</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-homem"></use></svg></div>
+<h3>Diego Mendonça</h3>
+<p>Caminho dos Goyazes</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Fernanda G. de F. Rodrigues</h3>
+<p>Impactos socioeconômicos do geoturismo</p>
+</article>
+<article class="integrante">
+<div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-mulher"></use></svg></div>
+<h3>Camila Prado</h3>
+<p>Risco de incêndios</p>
+</article>
+<article class="integrante"><div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-homem"></use></svg></div><h3>Vitor Galvão</h3><p>Mapeamento de processos erosivos</p></article></div>
 
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/gustavo-souza.jpg" alt="Fotografia de Gustavo S. Souza" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Gustavo S. Souza</h3>
-  <p>Dinâmica da paisagem</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/stffane-lemes.jpg" alt="Fotografia de Stffane B. F. Lemes" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Stffane B. F. Lemes</h3>
-  <p>Conectividade da paisagem</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/sara-santos.jpg" alt="Fotografia de Sara Santos" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Sara Santos</h3>
-  <p>Conflitos de uso das terras</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/luana-oliveira.jpg" alt="Fotografia de Luana C. Oliveira" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Luana C. Oliveira</h3>
-  <p>Análise de conectividade</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/helen-andrade.jpg" alt="Fotografia de Helen Lima de Andrade" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Helen Lima de Andrade</h3>
-  <p>Serviços ecossistêmicos culturais</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/jaqueline-batista.jpg" alt="Fotografia de Jaqueline Batista" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Jaqueline Batista</h3>
-  <p>Avaliação da integridade ambiental</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/murilo-oliveira.jpg" alt="Fotografia de Murilo Galdino de Oliveira" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Murilo Galdino de Oliveira</h3>
-  <p>Perda de solos</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/diego-mendonca.jpg" alt="Fotografia de Diego Mendonça" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Diego Mendonça</h3>
-  <p>Caminho dos Goyazes</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/fernanda-rodrigues.jpg" alt="Fotografia de Fernanda G. de F. Rodrigues" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Fernanda G. de F. Rodrigues</h3>
-  <p>Impactos socioeconômicos do geoturismo</p>
-</article>
-<article class="integrante">
-  <div class="retrato"><img src="imagens/equipe/camila-incendios.jpg" alt="Fotografia de Camila — identificação a confirmar" loading="lazy" onerror="this.hidden=true;this.parentElement.classList.add('sem-foto')"></div>
-  <h3>Camila — identificação a confirmar</h3>
-  <p>Risco de incêndios</p>
-</article>
-    </div>
-    <p class="equipe-nota">Nomes abreviados e atribuições transcritos do material de referência; revisar antes da divulgação definitiva. Fotografias serão exibidas quando forem adicionadas à pasta imagens/equipe/.</p>
-  </section>
-  <section class="panel"><h2>Instituições e apoios</h2><p>Espaço reservado às instituições participantes, aos parceiros e às respectivas logomarcas.</p></section>
-  <section class="panel"><h2>Contato</h2><p>Espaço reservado ao e-mail institucional e aos canais oficiais do projeto.</p></section>
+</section>
+<section class="panel"><h2>Instituições e apoios</h2><p>Espaço reservado às instituições participantes, aos parceiros e às respectivas logomarcas.</p></section>
+<section class="panel"><h2>Contato</h2><p>Espaço reservado ao e-mail institucional e aos canais oficiais do projeto.</p></section>
 </div>
 </main>
 <footer><div class="container"><strong>Caminho dos Goyazes: A Ciência das Paisagens</strong><p>Projeto de pesquisa e divulgação científica</p><p>© <span id="ano"></span> Projeto de pesquisa</p></div></footer>
-<script src="site.js" defer></script>
+<script defer="" src="site.js"></script>
 </body>
 </html>

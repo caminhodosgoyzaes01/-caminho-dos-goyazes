@@ -1,26 +1,28 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
 
-  <title>Cartografia das Paisagens | Caminho dos Goyazes</title>
+  <title>
+    Cartografia das Paisagens | Caminho dos Goyazes
+  </title>
 
   <link rel="stylesheet" href="estilo.css?v=3">
 
   <style>
+
+    /* ESTRUTURA GERAL */
+
     .cartografia {
       max-width: 1250px;
       margin: 35px auto;
       padding: 0 20px 60px;
     }
 
-    .cartografia h1 {
-      color: #285943;
-      margin-bottom: 12px;
-    }
-
+    .cartografia h1,
     .cartografia h2 {
       color: #285943;
       margin-bottom: 12px;
@@ -35,7 +37,8 @@
       margin-bottom: 25px;
     }
 
-    /* Abas principais */
+    /* NAVEGAÇÃO ENTRE AS TRILHAS */
+
     .abas-cartografia {
       display: flex;
       flex-wrap: wrap;
@@ -63,11 +66,12 @@
     .abas-cartografia button.ativo,
     .temas-cartografia button.ativo {
       background: #285943;
-      color: #ffffff;
+      color: white;
       border-color: #285943;
     }
 
-    /* Painéis */
+    /* PAINÉIS */
+
     .painel-cartografia {
       display: none;
     }
@@ -76,7 +80,8 @@
       display: block;
     }
 
-    /* Google My Maps */
+    /* GOOGLE MY MAPS */
+
     .visualizador-integrado {
       border: 1px solid #dce5df;
       border-radius: 12px;
@@ -101,7 +106,36 @@
       font-weight: 600;
     }
 
-    /* Organização dos mapas temáticos */
+    /* RESPONSABILIDADE CIENTÍFICA */
+
+    .creditos-pesquisa {
+      background: #f5f8f6;
+      border-left: 4px solid #285943;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 20px 0 25px;
+    }
+
+    .creditos-pesquisa h3 {
+      color: #285943;
+      font-size: 17px;
+      margin: 0 0 12px;
+    }
+
+    .creditos-pesquisa p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 6px 0;
+    }
+
+    .projeto-vinculado {
+      border-top: 1px solid #dce5df;
+      margin-top: 14px;
+      padding-top: 10px;
+    }
+
+    /* MAPAS TEMÁTICOS */
+
     .cartografia-tematica {
       display: grid;
       grid-template-columns: 260px minmax(0, 1fr);
@@ -148,8 +182,10 @@
       color: #52665a;
     }
 
-    /* Celulares */
+    /* ADAPTAÇÃO PARA CELULARES */
+
     @media (max-width: 750px) {
+
       .cartografia-tematica {
         grid-template-columns: 1fr;
       }
@@ -165,11 +201,15 @@
       .abas-cartografia button {
         flex: 1 1 180px;
       }
+
     }
+
   </style>
 </head>
 
 <body>
+
+  <!-- MENU PRINCIPAL DO SITE -->
 
   <header>
     <div class="container">
@@ -192,42 +232,42 @@
       e informações geográficas produzidas no âmbito
       do projeto Conectividade das Paisagens do Caminho
       dos Goyazes para a Gestão Sustentável do Cerrado
-      Goiano. Os mapas permitem explorar diferentes
-      características ambientais e territoriais do
-      Caminho de Cora Coralina e do Caminho dos Veadeiros.
+      Goiano.
+
+      Os mapas permitem explorar diferentes
+      características ambientais e territoriais
+      do Caminho de Cora Coralina e do
+      Caminho dos Veadeiros.
     </p>
 
-    <!-- NAVEGAÇÃO PRINCIPAL -->
+    <!-- SELEÇÃO DO CONJUNTO DE MAPAS -->
 
     <div class="abas-cartografia"
          role="group"
          aria-label="Selecionar conjunto de mapas">
 
-      <button
-        type="button"
-        class="ativo"
-        aria-pressed="true"
-        onclick="abrirPainel('integrado', this)">
+      <button type="button"
+              class="ativo"
+              aria-pressed="true"
+              onclick="abrirPainel('integrado', this)">
         Mapa integrado
       </button>
 
-      <button
-        type="button"
-        aria-pressed="false"
-        onclick="abrirPainel('cora', this)">
+      <button type="button"
+              aria-pressed="false"
+              onclick="abrirPainel('cora', this)">
         Caminho de Cora Coralina
       </button>
 
-      <button
-        type="button"
-        aria-pressed="false"
-        onclick="abrirPainel('veadeiros', this)">
+      <button type="button"
+              aria-pressed="false"
+              onclick="abrirPainel('veadeiros', this)">
         Caminho dos Veadeiros
       </button>
 
     </div>
 
-    <!-- MAPA INTEGRADO DO GOOGLE MY MAPS -->
+    <!-- MAPA INTEGRADO GOOGLE MY MAPS -->
 
     <section id="integrado"
              class="painel-cartografia ativo">
@@ -238,6 +278,7 @@
         Visualização conjunta das informações
         geográficas relacionadas ao Caminho de Cora
         Coralina e ao Caminho dos Veadeiros.
+
         O mapa permite explorar os elementos
         representados e consultar as informações
         disponibilizadas no Google My Maps.
@@ -247,7 +288,7 @@
 
         <iframe
           src="https://www.google.com/maps/d/embed?mid=1sVA7-akaD0YkFPAjJjYVD8RTrTW5FgU"
-          title="Mapa integrado das paisagens do Caminho dos Goyazes"
+          title="Mapa integrado das paisagens"
           loading="lazy"
           allowfullscreen>
         </iframe>
@@ -277,6 +318,12 @@
         com informações sobre as características
         ambientais, territoriais e a conectividade
         das paisagens ao longo da trilha.
+      </p>
+
+      <p>
+        Os mapas e a identificação da pesquisa
+        responsável serão incorporados
+        progressivamente nesta seção.
       </p>
 
       <div class="cartografia-tematica">
@@ -309,6 +356,67 @@
         das paisagens ao longo da trilha.
       </p>
 
+      <!-- RESPONSABILIDADE CIENTÍFICA -->
+
+      <div class="creditos-pesquisa">
+
+        <h3>
+          Responsabilidade científica e cartográfica
+        </h3>
+
+        <p>
+          <strong>Pesquisa:</strong>
+          Análise da Fragmentação e Conectividade
+          da Paisagem nas Trilhas de Longo Curso
+          do Caminho dos Veadeiros: seção baixa
+          e seção final em 2025.
+        </p>
+
+        <p>
+          <strong>Pesquisadora:</strong>
+          Stffane Beatriz Figueredo Lemes
+        </p>
+
+        <p>
+          <strong>Orientação:</strong>
+          Karla Maria Silva de Faria
+        </p>
+
+        <p>
+          <strong>Instituição:</strong>
+          Universidade Federal de Goiás —
+          Programa de Pós-Graduação em Geografia
+        </p>
+
+        <p>
+          <strong>Ano:</strong> 2026
+        </p>
+
+        <div class="projeto-vinculado">
+
+          <p>
+            <strong>
+              Projeto de pesquisa vinculado:
+            </strong>
+          </p>
+
+          <p>
+            Conectividade das Paisagens do Caminho
+            dos Goyazes para a Gestão Sustentável
+            do Cerrado Goiano.
+          </p>
+
+          <p>
+            Chamada CNPq/MCTI nº 10/2023 —
+            Processo nº 404750/2023-0.
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- MENU E VISUALIZADOR DOS MAPAS -->
+
       <div class="cartografia-tematica">
 
         <div class="temas-cartografia"
@@ -328,45 +436,100 @@
   </main>
 
   <script>
-    // Temas inicialmente previstos para as duas trilhas.
-    const temas = [
-  "Localização e Unidades de Conservação",
-  "Relevo e altimetria",
-  "Solos",
-  "Hidrografia",
-  "Uso e cobertura da terra",
-  "Conectividade das paisagens",
-  "Síntese geoecológica"
-];
 
-    // Endereços dos mapas QGIS2Web.
-    // Serão preenchidos conforme os mapas forem publicados.
-   const mapas = {
-  cora: {},
-  veadeiros: {
-    "Localização e Unidades de Conservação":
-      "mapas-qgis/veadeiros/localizacao-ucs/veadeiros_localizacao_ucs_qgis2web/qgis2web_2026_10_23-16_40_50_234682/index.html"
-  }
-};
+    /*
+      TEMAS GEOGRÁFICOS
+
+      As duas trilhas possuem listas independentes.
+      Isso permite acrescentar os mapas de
+      Cora Coralina posteriormente.
+    */
+
+    const temas = {
+
+      cora: [
+        "Localização e Unidades de Conservação",
+        "Relevo e altimetria",
+        "Solos",
+        "Hidrografia",
+        "Uso e cobertura da terra",
+        "Conectividade das paisagens",
+        "Síntese geoecológica"
+      ],
+
+      veadeiros: [
+        "Localização e Unidades de Conservação",
+        "Declividade",
+        "Hipsometria",
+        "Tipos de compartimentação",
+        "Unidades geomorfológicas",
+        "Bacias hidrográficas",
+        "Regiões hidrográficas",
+        "Drenagem e nascentes",
+        "Tipos de solo"
+      ]
+
+    };
+
+    /*
+      ENDEREÇOS DOS MAPAS QGIS2WEB
+
+      O primeiro mapa dos Veadeiros já está publicado.
+      Os demais serão acrescentados posteriormente.
+    */
+
+    const mapas = {
+
+      cora: {},
+
+      veadeiros: {
+
+        "Localização e Unidades de Conservação":
+          "mapas-qgis/veadeiros/localizacao-ucs/veadeiros_localizacao_ucs_qgis2web/qgis2web_2026_10_23-16_40_50_234682/index.html"
+
+      }
+
+    };
+
+    /*
+      NAVEGAÇÃO ENTRE OS PAINÉIS
+    */
 
     function abrirPainel(id, botao) {
+
       document.querySelectorAll(".painel-cartografia")
         .forEach(painel => {
+
           painel.classList.toggle(
             "ativo",
             painel.id === id
           );
+
         });
 
-      document.querySelectorAll(".abas-cartografia button")
-        .forEach(item => {
-          const ativo = item === botao;
-          item.classList.toggle("ativo", ativo);
-          item.setAttribute("aria-pressed", String(ativo));
-        });
+      document.querySelectorAll(
+        ".abas-cartografia button"
+      ).forEach(item => {
+
+        const ativo = item === botao;
+
+        item.classList.toggle("ativo", ativo);
+
+        item.setAttribute(
+          "aria-pressed",
+          String(ativo)
+        );
+
+      });
+
     }
 
+    /*
+      EXIBIÇÃO DOS MAPAS TEMÁTICOS
+    */
+
     function mostrarTema(trilha, tema, botao) {
+
       const painel = document.getElementById(
         "conteudo-" + trilha
       );
@@ -376,19 +539,28 @@
       document.querySelectorAll(
         "#temas-" + trilha + " button"
       ).forEach(item => {
-        item.classList.toggle("ativo", item === botao);
+
+        item.classList.toggle(
+          "ativo",
+          item === botao
+        );
+
       });
 
       painel.replaceChildren();
 
       const titulo = document.createElement("h3");
+
       titulo.textContent = tema;
+
       painel.appendChild(titulo);
 
       if (endereco) {
+
         const iframe = document.createElement("iframe");
 
         iframe.src = endereco;
+
         iframe.title = tema + " - " +
           (trilha === "cora"
             ? "Caminho de Cora Coralina"
@@ -398,26 +570,39 @@
         iframe.allowFullscreen = true;
 
         painel.appendChild(iframe);
+
       } else {
+
         const aviso = document.createElement("p");
+
         aviso.className = "aviso-mapa";
+
         aviso.textContent =
           "Mapa em preparação. O conteúdo cartográfico " +
           "será disponibilizado nesta seção.";
+
         painel.appendChild(aviso);
+
       }
+
     }
 
-    // Montagem automática dos menus temáticos.
+    /*
+      CRIAÇÃO DOS MENUS TEMÁTICOS
+    */
+
     ["cora", "veadeiros"].forEach(trilha => {
+
       const menu = document.getElementById(
         "temas-" + trilha
       );
 
-      temas.forEach((tema, indice) => {
+      temas[trilha].forEach((tema, indice) => {
+
         const botao = document.createElement("button");
 
         botao.type = "button";
+
         botao.textContent = tema;
 
         botao.onclick = () => {
@@ -429,8 +614,11 @@
         if (indice === 0) {
           mostrarTema(trilha, tema, botao);
         }
+
       });
+
     });
+
   </script>
 
 </body>

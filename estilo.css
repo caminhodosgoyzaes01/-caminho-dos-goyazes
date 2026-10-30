@@ -118,18 +118,29 @@ footer p { font-size: 13px; color: #b8cfc0; }
     font-size: clamp(30px, 8vw, 42px);
   }
 }
-/* Logomarca do projeto no cabeçalho */
+/* Logomarca no cabeçalho */
 
-.brand .logo-projeto {
-  width: 70px;
-  height: 70px;
+.site-header .brand {
+  display: flex;
+  align-items: center;
+  flex: 0 1 260px;
+  min-width: 0;
+}
+
+.site-header .brand .logo-projeto {
+  display: block;
+  width: 260px;
+  max-width: 100%;
+  height: auto;
   object-fit: contain;
-  flex-shrink: 0;
 }
 
 @media (max-width: 600px) {
-  .brand .logo-projeto {
-    width: 52px;
-    height: 52px;
+  .site-header .brand {
+    flex-basis: 180px;
+  }
+
+  .site-header .brand .logo-projeto {
+    width: 180px;
   }
 }

@@ -118,3 +118,18 @@ footer p { font-size: 13px; color: #b8cfc0; }
     font-size: clamp(30px, 8vw, 42px);
   }
 }
+/* Logomarca do projeto no cabeçalho */
+
+.brand .logo-projeto {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .brand .logo-projeto {
+    width: 52px;
+    height: 52px;
+  }
+}

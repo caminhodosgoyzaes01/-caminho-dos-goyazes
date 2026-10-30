@@ -34,6 +34,20 @@
 .retrato svg{width:100%;height:100%;display:block}
 @media(max-width:1050px){.grade-coordenacao{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.grade-coordenacao{grid-template-columns:repeat(2,minmax(0,1fr))}.grade-coordenacao .retrato{width:100px;height:100px}}
+
+/* Instituições e apoios */
+.instituicoes-grupo{margin:22px 0 28px}
+.instituicoes-grupo h3{font-size:1.15rem;color:#285943;margin:0 0 14px}
+.logos-instituicoes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.logo-instituicao{margin:0;border:1px solid #e0e8df;background:#fff;border-radius:14px;padding:16px;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:12px;text-align:center}
+.logo-instituicao img{width:100%;max-width:235px;height:125px;object-fit:contain}
+.logo-instituicao figcaption{font-size:13px;color:#3d5b4c;line-height:1.45}
+.logo-instituicao.fundo-escuro .area-logo{background:#243b33;border-radius:9px;width:100%;display:flex;align-items:center;justify-content:center;padding:12px}
+.logo-instituicao.fundo-escuro img{height:100px}
+.financiamento-projeto{border-left:4px solid #a87539;padding:15px 18px;background:#f7f8f4;border-radius:0 10px 10px 0}
+.financiamento-projeto p{margin:5px 0;line-height:1.6}
+@media(max-width:800px){.logos-instituicoes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.logos-instituicoes{grid-template-columns:1fr}}
 </style>
 </head>
 <body><svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" xmlns="http://www.w3.org/2000/svg"><defs>
@@ -159,9 +173,30 @@
 <p>Risco de incêndios</p>
 </article>
 <article class="integrante"><div class="retrato"><svg aria-label="Ilustração genérica de integrante da equipe" role="img"><use href="#avatar-homem"></use></svg></div><h3>Vitor Galvão</h3><p>Mapeamento de processos erosivos</p></article></div>
-
 </section>
-<section class="panel"><h2>Instituições e apoios</h2><p>Espaço reservado às instituições participantes, aos parceiros e às respectivas logomarcas.</p></section>
+<section aria-labelledby="instituicoes-titulo" class="panel" id="instituicoes-apoios">
+<h2 id="instituicoes-titulo">Instituições e apoios</h2>
+<p>Instituições acadêmicas, grupos de pesquisa e organizações parceiras envolvidos nas atividades do projeto.</p>
+<div class="instituicoes-grupo"><h3>Instituições acadêmicas</h3>
+<div class="logos-instituicoes">
+<figure class="logo-instituicao"><img alt="Logomarca do Instituto de Estudos Socioambientais da UFG" loading="lazy" src="imagens/instituicoes/iesa-ufg.svg"/><figcaption>Instituto de Estudos Socioambientais · UFG</figcaption></figure>
+<figure class="logo-instituicao"><img alt="Logomarca do Instituto Federal de Brasília, Campus Riacho Fundo" loading="lazy" src="imagens/instituicoes/ifb-riacho-fundo.jpg"/><figcaption>Instituto Federal de Brasília · Campus Riacho Fundo</figcaption></figure>
+</div></div>
+<div class="instituicoes-grupo"><h3>Grupos de pesquisa</h3>
+<div class="logos-instituicoes">
+<figure class="logo-instituicao"><img alt="Logomarca GEOPAC" loading="lazy" src="imagens/instituicoes/geopac.jpg"/><figcaption>Grupo de Pesquisa Geoecologia das Paisagens do Cerrado</figcaption></figure>
+<figure class="logo-instituicao"><img alt="Logomarca GEOTUR" loading="lazy" src="imagens/instituicoes/geotur.jpg"/><figcaption>Grupo de Pesquisa Geociências, Geotecnologias e Turismo</figcaption></figure>
+</div></div>
+<div class="instituicoes-grupo"><h3>Associações parceiras</h3>
+<div class="logos-instituicoes">
+<figure class="logo-instituicao fundo-escuro"><div class="area-logo"><img alt="Logomarca Caminho de Cora Coralina" loading="lazy" src="imagens/instituicoes/caminho-cora-coralina.png"/></div><figcaption>Associação do Caminho de Cora Coralina</figcaption></figure>
+<figure class="logo-instituicao"><img alt="Logomarca Caminho dos Veadeiros" loading="lazy" src="imagens/instituicoes/caminho-veadeiros.png"/><figcaption>Associação do Caminho dos Veadeiros</figcaption></figure>
+</div></div>
+<div class="instituicoes-grupo"><h3>Financiamento</h3>
+<div class="financiamento-projeto"><p><strong>Conselho Nacional de Desenvolvimento Científico e Tecnológico (CNPq)</strong></p>
+<p><strong>Projeto:</strong> Conectividade das Paisagens do Caminho dos Goyazes para a Gestão Sustentável do Cerrado Goiano.</p>
+<p><strong>Chamada:</strong> CNPq/MCTI nº 10/2023 · <strong>Processo:</strong> 404750/2023-0</p></div></div>
+</section>
 <section class="panel"><h2>Contato</h2><p>Espaço reservado ao e-mail institucional e aos canais oficiais do projeto.</p></section>
 </div>
 </main>

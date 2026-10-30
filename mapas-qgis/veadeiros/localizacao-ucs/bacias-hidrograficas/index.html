@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="data/BaciasHidrogrficas_2.js"></script>
+        <script src="data/Limitesmunicipais_3.js"></script>
+        <script src="data/RotasdoCaminhodosVeadeiros_4.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:8
+        }).fitBounds([[-15.588072823459797,-48.65169423826291],[-13.701015004056089,-46.21315553257917]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // modify popup if contains media
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    var img = popup._contentNode.querySelector('td img');
+                    if (img) {
+                        // If already loaded (cache), update immediately
+                        if (img.complete && img.naturalHeight > 0) {
+                            popup.update();
+                        } else {
+                            img.addEventListener('load', function() {
+                                popup.update();
+                            });
+                            img.addEventListener('error', function() {
+                                popup.update();
+                            });
+                        }
+                    }
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    // Aggiorna il popup quando il video carica i metadati
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_EsriImagery_0');
+        map.getPane('pane_EsriImagery_0').style.zIndex = 400;
+        var layer_EsriImagery_0 = L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_EsriImagery_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 8,
+            maxZoom: 28,
+        });
+        layer_EsriImagery_0;
+        map.addLayer(layer_EsriImagery_0);
+        map.createPane('pane_EsriTopographic_1');
+        map.getPane('pane_EsriTopographic_1').style.zIndex = 401;
+        var layer_EsriTopographic_1 = L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_EsriTopographic_1',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 8,
+            maxZoom: 28,
+        });
+        layer_EsriTopographic_1;
+        map.addLayer(layer_EsriTopographic_1);
+        function pop_BaciasHidrogrficas_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIV_1'] !== null ? autolinker.link(String(feature.properties['NIV_1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIV_2'] !== null ? autolinker.link(String(feature.properties['NIV_2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIV_3'] !== null ? autolinker.link(String(feature.properties['NIV_3']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIV_4'] !== null ? autolinker.link(String(feature.properties['NIV_4']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIV_5'] !== null ? autolinker.link(String(feature.properties['NIV_5']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NIV_6'] !== null ? autolinker.link(String(feature.properties['NIV_6']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RIO1'] !== null ? autolinker.link(String(feature.properties['RIO1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RIO2'] !== null ? autolinker.link(String(feature.properties['RIO2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RIO3'] !== null ? autolinker.link(String(feature.properties['RIO3']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RIO4'] !== null ? autolinker.link(String(feature.properties['RIO4']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RIO5'] !== null ? autolinker.link(String(feature.properties['RIO5']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RIO6'] !== null ? autolinker.link(String(feature.properties['RIO6']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['PERIM_KM'] !== null ? autolinker.link(String(feature.properties['PERIM_KM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA_KM2'] !== null ? autolinker.link(String(feature.properties['AREA_KM2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BaciasHidrogrficas_2_0(feature) {
+            switch(String(feature.properties['RIO4'])) {
+                case 'Bacia Hidrografica Rio Bagagem':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(192,162,208,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bacia Hidrografica Rio Corumba':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(154,48,208,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bacia Hidrografica Rio Maranhao':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,191,246,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bacia Hidrografica Rio Preto':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(241,73,176,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bacia Hidrografica Rio Tocantinzinho':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(241,160,210,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Bacia Hidrografica Rio Urucuia':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,247,180,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Regiao Hidrografica Rio Parana - Foz Rio Agua Quente / Rio Corrente':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(200,200,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Regiao Hidrografica Rio Parana - Foz Rio Palma / Rio S. Domingos':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,247,8,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Regiao Hidrografica Rio Parana a montante da Foz Rio Corrente':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(106,176,20,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Regiao Hidrografica Rio Tocantins - Foz Rio Parana / Rio Preto':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(184,225,134,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Regiao Hidrografica Rio Tocantins - Foz Rio Preto / Rio Tocantinzinho':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(77,172,167,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Regiao Hidrografica Rio Tocantins - Foz Rio Tocantinzinho / Rio Bagagem':
+                    return {
+                pane: 'pane_BaciasHidrogrficas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(140,196,230,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_BaciasHidrogrficas_2');
+        map.getPane('pane_BaciasHidrogrficas_2').style.zIndex = 402;
+        map.getPane('pane_BaciasHidrogrficas_2').style['mix-blend-mode'] = 'normal';
+        var layer_BaciasHidrogrficas_2 = new L.geoJson(json_BaciasHidrogrficas_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_BaciasHidrogrficas_2',
+            layerName: 'layer_BaciasHidrogrficas_2',
+            pane: 'pane_BaciasHidrogrficas_2',
+            onEachFeature: pop_BaciasHidrogrficas_2,
+            style: style_BaciasHidrogrficas_2_0,
+        });
+        bounds_group.addLayer(layer_BaciasHidrogrficas_2);
+        map.addLayer(layer_BaciasHidrogrficas_2);
+        function pop_Limitesmunicipais_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_MUN'] !== null ? autolinker.link(String(feature.properties['CD_MUN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_MUN'] !== null ? autolinker.link(String(feature.properties['NM_MUN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_RGI'] !== null ? autolinker.link(String(feature.properties['CD_RGI']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_RGI'] !== null ? autolinker.link(String(feature.properties['NM_RGI']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_RGINT'] !== null ? autolinker.link(String(feature.properties['CD_RGINT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_RGINT'] !== null ? autolinker.link(String(feature.properties['NM_RGINT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_UF'] !== null ? autolinker.link(String(feature.properties['CD_UF']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_UF'] !== null ? autolinker.link(String(feature.properties['NM_UF']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_REGIAO'] !== null ? autolinker.link(String(feature.properties['CD_REGIAO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_REGIAO'] !== null ? autolinker.link(String(feature.properties['NM_REGIAO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_CONCURB'] !== null ? autolinker.link(String(feature.properties['CD_CONCURB']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_CONCURB'] !== null ? autolinker.link(String(feature.properties['NM_CONCURB']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA_KM2'] !== null ? autolinker.link(String(feature.properties['AREA_KM2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Limitesmunicipais_3_0() {
+            return {
+                pane: 'pane_Limitesmunicipais_3',
+                opacity: 1,
+                color: 'rgba(183,183,183,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(164,113,88,0.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Limitesmunicipais_3');
+        map.getPane('pane_Limitesmunicipais_3').style.zIndex = 403;
+        map.getPane('pane_Limitesmunicipais_3').style['mix-blend-mode'] = 'normal';
+        var layer_Limitesmunicipais_3 = new L.geoJson(json_Limitesmunicipais_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Limitesmunicipais_3',
+            layerName: 'layer_Limitesmunicipais_3',
+            pane: 'pane_Limitesmunicipais_3',
+            onEachFeature: pop_Limitesmunicipais_3,
+            style: style_Limitesmunicipais_3_0,
+        });
+        bounds_group.addLayer(layer_Limitesmunicipais_3);
+        map.addLayer(layer_Limitesmunicipais_3);
+        function pop_RotasdoCaminhodosVeadeiros_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? autolinker.link(String(feature.properties['id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Name</strong><br />' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['descriptio'] !== null ? autolinker.link(String(feature.properties['descriptio']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['timestamp'] !== null ? autolinker.link(String(feature.properties['timestamp']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['begin'] !== null ? autolinker.link(String(feature.properties['begin']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['end'] !== null ? autolinker.link(String(feature.properties['end']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['altitudeMo'] !== null ? autolinker.link(String(feature.properties['altitudeMo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tessellate'] !== null ? autolinker.link(String(feature.properties['tessellate']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['extrude'] !== null ? autolinker.link(String(feature.properties['extrude']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['visibility'] !== null ? autolinker.link(String(feature.properties['visibility']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['drawOrder'] !== null ? autolinker.link(String(feature.properties['drawOrder']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['icon'] !== null ? autolinker.link(String(feature.properties['icon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_RotasdoCaminhodosVeadeiros_4_0(feature) {
+            switch(String(feature.properties['Name'])) {
+                case 'CV_track_trekking':
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(160,43,45,1.0)',
+                dashArray: '3.0,6.0',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'CV-Bike-CaminhoAlto':
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(193,108,0,1.0)',
+                dashArray: '1.0,2.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'CV-Bike-CaminhoBaixo':
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '3.0,6.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(212,23,193,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_RotasdoCaminhodosVeadeiros_4');
+        map.getPane('pane_RotasdoCaminhodosVeadeiros_4').style.zIndex = 404;
+        map.getPane('pane_RotasdoCaminhodosVeadeiros_4').style['mix-blend-mode'] = 'normal';
+        var layer_RotasdoCaminhodosVeadeiros_4 = new L.geoJson(json_RotasdoCaminhodosVeadeiros_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RotasdoCaminhodosVeadeiros_4',
+            layerName: 'layer_RotasdoCaminhodosVeadeiros_4',
+            pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+            onEachFeature: pop_RotasdoCaminhodosVeadeiros_4,
+            style: style_RotasdoCaminhodosVeadeiros_4_0,
+        });
+        bounds_group.addLayer(layer_RotasdoCaminhodosVeadeiros_4);
+        map.addLayer(layer_RotasdoCaminhodosVeadeiros_4);
+        var overlaysTree = [
+            {label: 'Rotas do Caminho dos Veadeiros<br /><table><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_CVtracktrekking0.png" /></td><td>CV_track_trekking</td></tr><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_CVBikeCaminhoAlto1.png" /></td><td>CV-Bike-CaminhoAlto</td></tr><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_CVBikeCaminhoBaixo2.png" /></td><td>CV-Bike-CaminhoBaixo</td></tr><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_3.png" /></td><td></td></tr></table>', layer: layer_RotasdoCaminhodosVeadeiros_4},
+            {label: '<img src="legend/Limitesmunicipais_3.png" /> Limites municipais', layer: layer_Limitesmunicipais_3},
+            {label: 'Bacias Hidrográficas<br /><table><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_BaciaHidrograficaRioBagagem0.png" /></td><td>Bacia Hidrografica Rio Bagagem</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_BaciaHidrograficaRioCorumba1.png" /></td><td>Bacia Hidrografica Rio Corumba</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_BaciaHidrograficaRioMaranhao2.png" /></td><td>Bacia Hidrografica Rio Maranhao</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_BaciaHidrograficaRioPreto3.png" /></td><td>Bacia Hidrografica Rio Preto</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_BaciaHidrograficaRioTocantinzinho4.png" /></td><td>Bacia Hidrografica Rio Tocantinzinho</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_BaciaHidrograficaRioUrucuia5.png" /></td><td>Bacia Hidrografica Rio Urucuia</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_RegiaoHidrograficaRioParanaFozRioAguaQuenteRioCorrente6.png" /></td><td>Regiao Hidrografica Rio Parana - Foz Rio Agua Quente / Rio Corrente</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_RegiaoHidrograficaRioParanaFozRioPalmaRioSDomingos7.png" /></td><td>Regiao Hidrografica Rio Parana - Foz Rio Palma / Rio S. Domingos</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_RegiaoHidrograficaRioParanaamontantedaFozRioCorrente8.png" /></td><td>Regiao Hidrografica Rio Parana a montante da Foz Rio Corrente</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_RegiaoHidrograficaRioTocantinsFozRioParanaRioPreto9.png" /></td><td>Regiao Hidrografica Rio Tocantins - Foz Rio Parana / Rio Preto</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_RegiaoHidrograficaRioTocantinsFozRioPretoRioTocantinzinho10.png" /></td><td>Regiao Hidrografica Rio Tocantins - Foz Rio Preto / Rio Tocantinzinho</td></tr><tr><td style="text-align: center;"><img src="legend/BaciasHidrogrficas_2_RegiaoHidrograficaRioTocantinsFozRioTocantinzinhoRioBagagem11.png" /></td><td>Regiao Hidrografica Rio Tocantins - Foz Rio Tocantinzinho / Rio Bagagem</td></tr></table>', layer: layer_BaciasHidrogrficas_2},
+            {label: "Esri Topographic", layer: layer_EsriTopographic_1},
+            {label: "Esri Imagery", layer: layer_EsriImagery_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        var i = 0;
+        layer_Limitesmunicipais_3.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NM_MUN'] !== null?String('<div style="color: #ffffff; font-size: 9pt; font-family: \'Times New Roman\', sans-serif;">' + layer.feature.properties['NM_MUN']).replace(/\\n/g, '<br>') + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Limitesmunicipais_3'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        resetLabels([layer_Limitesmunicipais_3]);
+        map.on("zoomend", function(){
+            resetLabels([layer_Limitesmunicipais_3]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_Limitesmunicipais_3]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_Limitesmunicipais_3]);
+        });
+        </script>        
+    </body>
+</html>

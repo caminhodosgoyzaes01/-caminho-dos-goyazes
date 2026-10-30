@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="data/UnidadesGeomorfolgicas_2.js"></script>
+        <script src="data/Limitesmunicipais_3.js"></script>
+        <script src="data/RotasdoCaminhodosVeadeiros_4.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:8
+        }).fitBounds([[-16.481036847360492,-49.36180631713538],[-12.706921208553076,-44.827105541957614]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // modify popup if contains media
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    var img = popup._contentNode.querySelector('td img');
+                    if (img) {
+                        // If already loaded (cache), update immediately
+                        if (img.complete && img.naturalHeight > 0) {
+                            popup.update();
+                        } else {
+                            img.addEventListener('load', function() {
+                                popup.update();
+                            });
+                            img.addEventListener('error', function() {
+                                popup.update();
+                            });
+                        }
+                    }
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    // Aggiorna il popup quando il video carica i metadati
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_EsriImagery_0');
+        map.getPane('pane_EsriImagery_0').style.zIndex = 400;
+        var layer_EsriImagery_0 = L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_EsriImagery_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 8,
+            maxZoom: 28,
+        });
+        layer_EsriImagery_0;
+        map.addLayer(layer_EsriImagery_0);
+        map.createPane('pane_EsriTopographic_1');
+        map.getPane('pane_EsriTopographic_1').style.zIndex = 401;
+        var layer_EsriTopographic_1 = L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_EsriTopographic_1',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 8,
+            maxZoom: 28,
+        });
+        layer_EsriTopographic_1;
+        map.addLayer(layer_EsriTopographic_1);
+        function pop_UnidadesGeomorfolgicas_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id1'] !== null ? autolinker.link(String(feature.properties['id1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['cd_fcim'] !== null ? autolinker.link(String(feature.properties['cd_fcim']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['leg_carga'] !== null ? autolinker.link(String(feature.properties['leg_carga']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['nm_dominio'] !== null ? autolinker.link(String(feature.properties['nm_dominio']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['nm_regiao'] !== null ? autolinker.link(String(feature.properties['nm_regiao']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id_unidade'] !== null ? autolinker.link(String(feature.properties['id_unidade']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['nm_unidade'] !== null ? autolinker.link(String(feature.properties['nm_unidade']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['letra_simb'] !== null ? autolinker.link(String(feature.properties['letra_simb']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['categoria'] !== null ? autolinker.link(String(feature.properties['categoria']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['natureza'] !== null ? autolinker.link(String(feature.properties['natureza']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['caract'] !== null ? autolinker.link(String(feature.properties['caract']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['forma'] !== null ? autolinker.link(String(feature.properties['forma']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['dens_dren'] !== null ? autolinker.link(String(feature.properties['dens_dren']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['aprof_inci'] !== null ? autolinker.link(String(feature.properties['aprof_inci']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['niv_alt'] !== null ? autolinker.link(String(feature.properties['niv_alt']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['leg_sup'] !== null ? autolinker.link(String(feature.properties['leg_sup']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['cd_leg_sup'] !== null ? autolinker.link(String(feature.properties['cd_leg_sup']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['legenda'] !== null ? autolinker.link(String(feature.properties['legenda']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ar_poli_km'] !== null ? autolinker.link(String(feature.properties['ar_poli_km']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['compartime'] !== null ? autolinker.link(String(feature.properties['compartime']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['cd_comp_id'] !== null ? autolinker.link(String(feature.properties['cd_comp_id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['cd_dominio'] !== null ? autolinker.link(String(feature.properties['cd_dominio']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['cd_unid_id'] !== null ? autolinker.link(String(feature.properties['cd_unid_id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_UnidadesGeomorfolgicas_2_0(feature) {
+            switch(String(feature.properties['nm_unidade'])) {
+                case 'Chapadão de São Gabriel do Oeste':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(198,149,207,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Chapadas do Alto Rio Maranhão':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(141,23,151,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Chapadas dos Rios Urucuia - Paracatu':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,209,36,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Complexo Montanhoso Veadeiros-Araí':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,124,126,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Complexos Serranos Circulares da Serra da Mesa':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,28,14,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Corpo d\'água continental':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,199,247,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Cristas e Colinas Rebaixadas do Rio Maranhão':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(96,234,197,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Cristas Médias do Complexo Veadeiros-Araí':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,238,149,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Depressão do Alto Tocantins':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(224,236,133,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Depressão do Médio Rio São Francisco':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(94,103,208,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Depressão Intermontana do Rio Preto':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(117,200,137,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Morros e Depressões Centrais das Estruturas Circulares':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,159,29,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Patamares das Chapadas dos Rios Urucuia - Paracatu':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(193,163,130,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Planalto de Cristalina':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(126,193,178,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Planalto Dissecado das Altas Bacias do Rio Maranhão':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(244,197,151,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Planalto do Norte de Goiás':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(220,201,117,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Planalto do Rio Bagagem':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,226,183,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Planícies e Terraços Fluviais':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,165,157,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Serra da Carreira Comprida':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,191,248,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Serra Geral do Paranã':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,79,172,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Serras de Unaí':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(193,108,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Superfícies Intermontanas do Alto Maranhão':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(253,219,14,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Superfícies Intermontanas Uruaçu - Ceres':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,186,201,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Vão do Paranã':
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(145,145,145,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(205,255,179,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_UnidadesGeomorfolgicas_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_UnidadesGeomorfolgicas_2');
+        map.getPane('pane_UnidadesGeomorfolgicas_2').style.zIndex = 402;
+        map.getPane('pane_UnidadesGeomorfolgicas_2').style['mix-blend-mode'] = 'normal';
+        var layer_UnidadesGeomorfolgicas_2 = new L.geoJson(json_UnidadesGeomorfolgicas_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_UnidadesGeomorfolgicas_2',
+            layerName: 'layer_UnidadesGeomorfolgicas_2',
+            pane: 'pane_UnidadesGeomorfolgicas_2',
+            onEachFeature: pop_UnidadesGeomorfolgicas_2,
+            style: style_UnidadesGeomorfolgicas_2_0,
+        });
+        bounds_group.addLayer(layer_UnidadesGeomorfolgicas_2);
+        map.addLayer(layer_UnidadesGeomorfolgicas_2);
+        function pop_Limitesmunicipais_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_MUN'] !== null ? autolinker.link(String(feature.properties['CD_MUN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_MUN'] !== null ? autolinker.link(String(feature.properties['NM_MUN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_RGI'] !== null ? autolinker.link(String(feature.properties['CD_RGI']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_RGI'] !== null ? autolinker.link(String(feature.properties['NM_RGI']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_RGINT'] !== null ? autolinker.link(String(feature.properties['CD_RGINT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_RGINT'] !== null ? autolinker.link(String(feature.properties['NM_RGINT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_UF'] !== null ? autolinker.link(String(feature.properties['CD_UF']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_UF'] !== null ? autolinker.link(String(feature.properties['NM_UF']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_REGIAO'] !== null ? autolinker.link(String(feature.properties['CD_REGIAO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_REGIAO'] !== null ? autolinker.link(String(feature.properties['NM_REGIAO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CD_CONCURB'] !== null ? autolinker.link(String(feature.properties['CD_CONCURB']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NM_CONCURB'] !== null ? autolinker.link(String(feature.properties['NM_CONCURB']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AREA_KM2'] !== null ? autolinker.link(String(feature.properties['AREA_KM2']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Limitesmunicipais_3_0() {
+            return {
+                pane: 'pane_Limitesmunicipais_3',
+                opacity: 1,
+                color: 'rgba(183,183,183,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(164,113,88,0.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Limitesmunicipais_3');
+        map.getPane('pane_Limitesmunicipais_3').style.zIndex = 403;
+        map.getPane('pane_Limitesmunicipais_3').style['mix-blend-mode'] = 'normal';
+        var layer_Limitesmunicipais_3 = new L.geoJson(json_Limitesmunicipais_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Limitesmunicipais_3',
+            layerName: 'layer_Limitesmunicipais_3',
+            pane: 'pane_Limitesmunicipais_3',
+            onEachFeature: pop_Limitesmunicipais_3,
+            style: style_Limitesmunicipais_3_0,
+        });
+        bounds_group.addLayer(layer_Limitesmunicipais_3);
+        map.addLayer(layer_Limitesmunicipais_3);
+        function pop_RotasdoCaminhodosVeadeiros_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? autolinker.link(String(feature.properties['id']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Name</th>\
+                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['descriptio'] !== null ? autolinker.link(String(feature.properties['descriptio']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['timestamp'] !== null ? autolinker.link(String(feature.properties['timestamp']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['begin'] !== null ? autolinker.link(String(feature.properties['begin']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['end'] !== null ? autolinker.link(String(feature.properties['end']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['altitudeMo'] !== null ? autolinker.link(String(feature.properties['altitudeMo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['tessellate'] !== null ? autolinker.link(String(feature.properties['tessellate']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['extrude'] !== null ? autolinker.link(String(feature.properties['extrude']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['visibility'] !== null ? autolinker.link(String(feature.properties['visibility']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['drawOrder'] !== null ? autolinker.link(String(feature.properties['drawOrder']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['icon'] !== null ? autolinker.link(String(feature.properties['icon']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_RotasdoCaminhodosVeadeiros_4_0(feature) {
+            switch(String(feature.properties['Name'])) {
+                case 'CV_track_trekking':
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(124,33,35,1.0)',
+                dashArray: '2.0,4.0',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'CV-Bike-CaminhoAlto':
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(193,108,0,1.0)',
+                dashArray: '2.0,4.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'CV-Bike-CaminhoBaixo':
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '2.0,4.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+                opacity: 1,
+                color: 'rgba(212,23,193,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_RotasdoCaminhodosVeadeiros_4');
+        map.getPane('pane_RotasdoCaminhodosVeadeiros_4').style.zIndex = 404;
+        map.getPane('pane_RotasdoCaminhodosVeadeiros_4').style['mix-blend-mode'] = 'normal';
+        var layer_RotasdoCaminhodosVeadeiros_4 = new L.geoJson(json_RotasdoCaminhodosVeadeiros_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RotasdoCaminhodosVeadeiros_4',
+            layerName: 'layer_RotasdoCaminhodosVeadeiros_4',
+            pane: 'pane_RotasdoCaminhodosVeadeiros_4',
+            onEachFeature: pop_RotasdoCaminhodosVeadeiros_4,
+            style: style_RotasdoCaminhodosVeadeiros_4_0,
+        });
+        bounds_group.addLayer(layer_RotasdoCaminhodosVeadeiros_4);
+        map.addLayer(layer_RotasdoCaminhodosVeadeiros_4);
+        var overlaysTree = [
+            {label: 'Rotas do Caminho dos Veadeiros<br /><table><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_CVtracktrekking0.png" /></td><td>CV_track_trekking</td></tr><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_CVBikeCaminhoAlto1.png" /></td><td>CV-Bike-CaminhoAlto</td></tr><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_CVBikeCaminhoBaixo2.png" /></td><td>CV-Bike-CaminhoBaixo</td></tr><tr><td style="text-align: center;"><img src="legend/RotasdoCaminhodosVeadeiros_4_3.png" /></td><td></td></tr></table>', layer: layer_RotasdoCaminhodosVeadeiros_4},
+            {label: '<img src="legend/Limitesmunicipais_3.png" /> Limites municipais', layer: layer_Limitesmunicipais_3},
+            {label: 'Unidades Geomorfológicas<br /><table><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_ChapadãodeSãoGabrieldoOeste0.png" /></td><td>Chapadão de São Gabriel do Oeste</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_ChapadasdoAltoRioMaranhão1.png" /></td><td>Chapadas do Alto Rio Maranhão</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_ChapadasdosRiosUrucuiaParacatu2.png" /></td><td>Chapadas dos Rios Urucuia - Paracatu</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_ComplexoMontanhosoVeadeirosAraí3.png" /></td><td>Complexo Montanhoso Veadeiros-Araí</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_ComplexosSerranosCircularesdaSerradaMesa4.png" /></td><td>Complexos Serranos Circulares da Serra da Mesa</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_Corpodáguacontinental5.png" /></td><td>Corpo d\'água continental</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_CristaseColinasRebaixadasdoRioMaranhão6.png" /></td><td>Cristas e Colinas Rebaixadas do Rio Maranhão</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_CristasMédiasdoComplexoVeadeirosAraí7.png" /></td><td>Cristas Médias do Complexo Veadeiros-Araí</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_DepressãodoAltoTocantins8.png" /></td><td>Depressão do Alto Tocantins</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_DepressãodoMédioRioSãoFrancisco9.png" /></td><td>Depressão do Médio Rio São Francisco</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_DepressãoIntermontanadoRioPreto10.png" /></td><td>Depressão Intermontana do Rio Preto</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_MorroseDepressõesCentraisdasEstruturasCirculares11.png" /></td><td>Morros e Depressões Centrais das Estruturas Circulares</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_PatamaresdasChapadasdosRiosUrucuiaParacatu12.png" /></td><td>Patamares das Chapadas dos Rios Urucuia - Paracatu</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_PlanaltodeCristalina13.png" /></td><td>Planalto de Cristalina</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_PlanaltoDissecadodasAltasBaciasdoRioMaranhão14.png" /></td><td>Planalto Dissecado das Altas Bacias do Rio Maranhão</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_PlanaltodoNortedeGoiás15.png" /></td><td>Planalto do Norte de Goiás</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_PlanaltodoRioBagagem16.png" /></td><td>Planalto do Rio Bagagem</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_PlanícieseTerraçosFluviais17.png" /></td><td>Planícies e Terraços Fluviais</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_SerradaCarreiraComprida18.png" /></td><td>Serra da Carreira Comprida</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_SerraGeraldoParanã19.png" /></td><td>Serra Geral do Paranã</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_SerrasdeUnaí20.png" /></td><td>Serras de Unaí</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_SuperfíciesIntermontanasdoAltoMaranhão21.png" /></td><td>Superfícies Intermontanas do Alto Maranhão</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_SuperfíciesIntermontanasUruaçuCeres22.png" /></td><td>Superfícies Intermontanas Uruaçu - Ceres</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_VãodoParanã23.png" /></td><td>Vão do Paranã</td></tr><tr><td style="text-align: center;"><img src="legend/UnidadesGeomorfolgicas_2_24.png" /></td><td></td></tr></table>', layer: layer_UnidadesGeomorfolgicas_2},
+            {label: "Esri Topographic", layer: layer_EsriTopographic_1},
+            {label: "Esri Imagery", layer: layer_EsriImagery_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        var i = 0;
+        layer_Limitesmunicipais_3.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NM_MUN'] !== null?String('<div style="color: #ffffff; font-size: 9pt; font-family: \'Times New Roman\', sans-serif;">' + layer.feature.properties['NM_MUN']).replace(/\\n/g, '<br>') + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Limitesmunicipais_3'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        resetLabels([layer_Limitesmunicipais_3]);
+        map.on("zoomend", function(){
+            resetLabels([layer_Limitesmunicipais_3]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_Limitesmunicipais_3]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_Limitesmunicipais_3]);
+        });
+        </script>        
+    </body>
+</html>

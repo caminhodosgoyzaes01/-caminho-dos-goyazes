@@ -144,3 +144,32 @@ footer p { font-size: 13px; color: #b8cfc0; }
     width: 180px;
   }
 }
+/* Ajuste definitivo do tamanho da logomarca */
+
+.site-header .header-inner .brand {
+  flex: 0 0 220px;
+  width: 220px;
+  max-width: 220px;
+  min-width: 0;
+}
+
+.site-header .header-inner .brand img.logo-projeto {
+  display: block;
+  width: 220px !important;
+  max-width: 220px !important;
+  height: auto !important;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  .site-header .header-inner .brand {
+    flex-basis: 160px;
+    width: 160px;
+    max-width: 160px;
+  }
+
+  .site-header .header-inner .brand img.logo-projeto {
+    width: 160px !important;
+    max-width: 160px !important;
+  }
+}

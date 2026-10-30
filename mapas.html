@@ -1,44 +1,169 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Mapas Interativos | Caminho dos Goyazes</title>
+  <title>Cartografia das Paisagens | Caminho dos Goyazes</title>
 
-  <link rel="stylesheet" href="estilo.css">
+  <link rel="stylesheet" href="estilo.css?v=3">
 
   <style>
-    .pagina-mapas {
-      max-width: 1200px;
-      margin: 40px auto;
-      padding: 0 20px;
+    .cartografia {
+      max-width: 1250px;
+      margin: 35px auto;
+      padding: 0 20px 60px;
     }
 
-    .pagina-mapas h1 {
+    .cartografia h1 {
+      color: #285943;
+      margin-bottom: 12px;
+    }
+
+    .cartografia h2 {
+      color: #285943;
+      margin-bottom: 12px;
+    }
+
+    .cartografia p {
+      line-height: 1.7;
+    }
+
+    .introducao {
+      max-width: 1000px;
+      margin-bottom: 25px;
+    }
+
+    /* Abas principais */
+    .abas-cartografia {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 25px 0;
+    }
+
+    .abas-cartografia button,
+    .temas-cartografia button {
+      cursor: pointer;
+      border: 1px solid #cad8d1;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: #f5f8f6;
+      color: #244c3d;
+      font: inherit;
+      transition: background 0.2s;
+    }
+
+    .abas-cartografia button:hover,
+    .temas-cartografia button:hover {
+      background: #dceae2;
+    }
+
+    .abas-cartografia button.ativo,
+    .temas-cartografia button.ativo {
+      background: #285943;
+      color: #ffffff;
+      border-color: #285943;
+    }
+
+    /* Painéis */
+    .painel-cartografia {
+      display: none;
+    }
+
+    .painel-cartografia.ativo {
+      display: block;
+    }
+
+    /* Google My Maps */
+    .visualizador-integrado {
+      border: 1px solid #dce5df;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 20px;
+      background: #f5f8f6;
+    }
+
+    .visualizador-integrado iframe {
+      width: 100%;
+      height: 580px;
+      border: 0;
+      display: block;
+    }
+
+    .link-mapa {
+      margin-top: 15px;
+    }
+
+    .link-mapa a {
+      color: #285943;
+      font-weight: 600;
+    }
+
+    /* Organização dos mapas temáticos */
+    .cartografia-tematica {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .temas-cartografia {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .temas-cartografia button {
+      text-align: left;
+    }
+
+    .area-mapa {
+      min-height: 420px;
+      padding: 20px;
+      border: 1px solid #dce5df;
+      border-radius: 12px;
+      min-width: 0;
+    }
+
+    .area-mapa h3 {
       color: #285943;
       margin-bottom: 15px;
     }
 
-    .descricao-mapa {
-      line-height: 1.7;
-      margin-bottom: 25px;
-    }
-
-    .mapa-interativo {
+    .area-mapa iframe {
       width: 100%;
-      height: 600px;
+      height: 550px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 8px;
+      display: block;
     }
 
-    .titulo-mapa {
-      margin-bottom: 15px;
+    .aviso-mapa {
+      margin-top: 20px;
+      padding: 25px;
+      background: #f5f8f6;
+      border-radius: 10px;
+      color: #52665a;
     }
 
-    @media (max-width: 768px) {
-      .mapa-interativo {
-        height: 450px;
+    /* Celulares */
+    @media (max-width: 750px) {
+      .cartografia-tematica {
+        grid-template-columns: 1fr;
+      }
+
+      .visualizador-integrado iframe {
+        height: 440px;
+      }
+
+      .area-mapa iframe {
+        height: 440px;
+      }
+
+      .abas-cartografia button {
+        flex: 1 1 180px;
       }
     }
   </style>
@@ -58,29 +183,253 @@
     </div>
   </header>
 
-  <main class="pagina-mapas">
+  <main class="cartografia">
 
-    <h1>Mapas Interativos</h1>
+    <h1>Cartografia das Paisagens</h1>
 
-    <p class="descricao-mapa">
-      Explore os mapas produzidos no âmbito do projeto
-      Conectividade das Paisagens do Caminho dos Goyazes
-      para a Gestão Sustentável do Cerrado Goiano.
+    <p class="introducao">
+      Esta seção reúne representações cartográficas
+      e informações geográficas produzidas no âmbito
+      do projeto Conectividade das Paisagens do Caminho
+      dos Goyazes para a Gestão Sustentável do Cerrado
+      Goiano. Os mapas permitem explorar diferentes
+      características ambientais e territoriais do
+      Caminho de Cora Coralina e do Caminho dos Veadeiros.
     </p>
 
-    <h2 class="titulo-mapa">
-      As Paisagens do Caminho dos Veadeiros
-    </h2>
+    <!-- NAVEGAÇÃO PRINCIPAL -->
 
-    <p class="descricao-mapa">
-      Navegue pelo mapa para conhecer os elementos
-      geográficos e as paisagens ao longo do percurso.
-      Utilize as ferramentas de aproximação e clique
-      nos elementos para consultar as informações.
-    </p>
+    <div class="abas-cartografia"
+         role="group"
+         aria-label="Selecionar conjunto de mapas">
 
-    <iframe
-      class="mapa-interativo"
-      src="https://www.google.com/maps/d/embed?mid=1sVA7-akaD0YkFPAjJjYVD8RTrTW5FgU"
-      loading="lazy"
-      title="As Paisagens do Caminho dos Veadeiros"
+      <button
+        type="button"
+        class="ativo"
+        aria-pressed="true"
+        onclick="abrirPainel('integrado', this)">
+        Mapa integrado
+      </button>
+
+      <button
+        type="button"
+        aria-pressed="false"
+        onclick="abrirPainel('cora', this)">
+        Caminho de Cora Coralina
+      </button>
+
+      <button
+        type="button"
+        aria-pressed="false"
+        onclick="abrirPainel('veadeiros', this)">
+        Caminho dos Veadeiros
+      </button>
+
+    </div>
+
+    <!-- MAPA INTEGRADO DO GOOGLE MY MAPS -->
+
+    <section id="integrado"
+             class="painel-cartografia ativo">
+
+      <h2>Mapa integrado das paisagens</h2>
+
+      <p>
+        Visualização conjunta das informações
+        geográficas relacionadas ao Caminho de Cora
+        Coralina e ao Caminho dos Veadeiros.
+        O mapa permite explorar os elementos
+        representados e consultar as informações
+        disponibilizadas no Google My Maps.
+      </p>
+
+      <div class="visualizador-integrado">
+
+        <iframe
+          src="https://www.google.com/maps/d/embed?mid=1sVA7-akaD0YkFPAjJjYVD8RTrTW5FgU"
+          title="Mapa integrado das paisagens do Caminho dos Goyazes"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+
+      </div>
+
+      <p class="link-mapa">
+        <a
+          href="https://www.google.com/maps/d/viewer?mid=1sVA7-akaD0YkFPAjJjYVD8RTrTW5FgU"
+          target="_blank"
+          rel="noopener noreferrer">
+          Abrir mapa integrado em uma nova janela
+        </a>
+      </p>
+
+    </section>
+
+    <!-- CAMINHO DE CORA CORALINA -->
+
+    <section id="cora"
+             class="painel-cartografia">
+
+      <h2>Caminho de Cora Coralina</h2>
+
+      <p>
+        Mapas temáticos produzidos pelo projeto,
+        com informações sobre as características
+        ambientais, territoriais e a conectividade
+        das paisagens ao longo da trilha.
+      </p>
+
+      <div class="cartografia-tematica">
+
+        <div class="temas-cartografia"
+             id="temas-cora"
+             aria-label="Temas do Caminho de Cora Coralina">
+        </div>
+
+        <div class="area-mapa"
+             id="conteudo-cora"
+             aria-live="polite">
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- CAMINHO DOS VEADEIROS -->
+
+    <section id="veadeiros"
+             class="painel-cartografia">
+
+      <h2>Caminho dos Veadeiros</h2>
+
+      <p>
+        Mapas temáticos produzidos pelo projeto,
+        com informações sobre as características
+        ambientais, territoriais e a conectividade
+        das paisagens ao longo da trilha.
+      </p>
+
+      <div class="cartografia-tematica">
+
+        <div class="temas-cartografia"
+             id="temas-veadeiros"
+             aria-label="Temas do Caminho dos Veadeiros">
+        </div>
+
+        <div class="area-mapa"
+             id="conteudo-veadeiros"
+             aria-live="polite">
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // Temas inicialmente previstos para as duas trilhas.
+    const temas = [
+      "Localização",
+      "Relevo e altimetria",
+      "Solos",
+      "Hidrografia",
+      "Uso e cobertura da terra",
+      "Unidades de Conservação",
+      "Conectividade das paisagens",
+      "Síntese geoecológica"
+    ];
+
+    // Endereços dos mapas QGIS2Web.
+    // Serão preenchidos conforme os mapas forem publicados.
+    const mapas = {
+      cora: {},
+      veadeiros: {}
+    };
+
+    function abrirPainel(id, botao) {
+      document.querySelectorAll(".painel-cartografia")
+        .forEach(painel => {
+          painel.classList.toggle(
+            "ativo",
+            painel.id === id
+          );
+        });
+
+      document.querySelectorAll(".abas-cartografia button")
+        .forEach(item => {
+          const ativo = item === botao;
+          item.classList.toggle("ativo", ativo);
+          item.setAttribute("aria-pressed", String(ativo));
+        });
+    }
+
+    function mostrarTema(trilha, tema, botao) {
+      const painel = document.getElementById(
+        "conteudo-" + trilha
+      );
+
+      const endereco = mapas[trilha][tema];
+
+      document.querySelectorAll(
+        "#temas-" + trilha + " button"
+      ).forEach(item => {
+        item.classList.toggle("ativo", item === botao);
+      });
+
+      painel.replaceChildren();
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = tema;
+      painel.appendChild(titulo);
+
+      if (endereco) {
+        const iframe = document.createElement("iframe");
+
+        iframe.src = endereco;
+        iframe.title = tema + " - " +
+          (trilha === "cora"
+            ? "Caminho de Cora Coralina"
+            : "Caminho dos Veadeiros");
+
+        iframe.loading = "lazy";
+        iframe.allowFullscreen = true;
+
+        painel.appendChild(iframe);
+      } else {
+        const aviso = document.createElement("p");
+        aviso.className = "aviso-mapa";
+        aviso.textContent =
+          "Mapa em preparação. O conteúdo cartográfico " +
+          "será disponibilizado nesta seção.";
+        painel.appendChild(aviso);
+      }
+    }
+
+    // Montagem automática dos menus temáticos.
+    ["cora", "veadeiros"].forEach(trilha => {
+      const menu = document.getElementById(
+        "temas-" + trilha
+      );
+
+      temas.forEach((tema, indice) => {
+        const botao = document.createElement("button");
+
+        botao.type = "button";
+        botao.textContent = tema;
+
+        botao.onclick = () => {
+          mostrarTema(trilha, tema, botao);
+        };
+
+        menu.appendChild(botao);
+
+        if (indice === 0) {
+          mostrarTema(trilha, tema, botao);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
